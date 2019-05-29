@@ -39,9 +39,9 @@ function drawToMouse(e){
     if (teste2 < 0) teste2 = 0
     if (teste2 > 1) teste2 = 1
 
-    console.log(teste, teste2)
+    console.log(teste*300, teste2*300)
 
-    drawAngle(x, y)
+    drawAngle(teste2*300+100, teste*300+100)
 }
 
 function drawAngle(x, y){
