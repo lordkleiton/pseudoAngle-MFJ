@@ -5,6 +5,8 @@ let ctx = canvas.getContext('2d')
 let centerX = canvas.clientWidth / 2
 let centerY = canvas.clientHeight / 2
 let maxWH = 300;
+let min = centerX - (maxWH / 2)
+let max = centerX + (maxWH / 2)
 
 canvas.addEventListener('mousemove', drawToMouse)
 ctx.fillStyle = 'black'
@@ -23,25 +25,21 @@ function drawToMouse(e){
     let y = e.clientY
     let x = e.clientX
 
-    if (e.clientY < centerY) y = centerY - y
-
     ctx.strokeStyle = 'black'
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
     ctx.lineTo(x, y)
     ctx.stroke()
 
+    let teste = (y-100)/300
+    if (teste < 0) teste = 0
+    if (teste > 1) teste = 1
 
+    let teste2 = (x-100)/300
+    if (teste2 < 0) teste2 = 0
+    if (teste2 > 1) teste2 = 1
 
-    /* if (y < 100) y = 100
-    if (y > 400) y = 400
-
-    if (x < 100) x = 100
-    if (x > 400) x = 400 */
-
-
-    console.log('y', y)
-    //console.log('x', x)
+    console.log(teste, teste2)
 
     drawAngle(x, y)
 }
@@ -51,14 +49,12 @@ function drawAngle(x, y){
     ctx.beginPath()
     ctx.moveTo(400, centerY)
     ctx.lineTo(400, y)
+    ctx.lineTo(x, y)
     ctx.stroke()
     ctx.strokeStyle = '#ccc'
 }
 
 function drawGrid(){
-    let min = centerX - (maxWH / 2)
-    let max = centerX + (maxWH / 2)
-
     ctx.strokeStyle = '#ccc'
     ctx.beginPath();
     ctx.moveTo(min, min)
