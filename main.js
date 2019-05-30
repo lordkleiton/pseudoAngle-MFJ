@@ -1,68 +1,116 @@
 'use strict'
 
-let canvas = document.getElementById('cv')
-let ctx = canvas.getContext('2d')
-let centerX = canvas.clientWidth / 2
-let centerY = canvas.clientHeight / 2
-let maxWH = 300;
-let padding = (canvas.clientWidth - maxWH) / 2
-let min = centerX - (maxWH / 2)
-let max = centerX + (maxWH / 2)
-let q = 0
+let maxWH = 300;                                            //largura e altura da caixa em px
+let maxVec = 2                                              //maximo de vetores
+let canvas = document.getElementById('cv')                  //canvas
+let btnZero = document.getElementById('zera')               //botão que zera
+let btnClear = document.getElementById('limpa')             //botão que limpa
+let ctx = canvas.getContext('2d')                           //contexto
+let centerX = canvas.clientWidth / 2                        //centro em x
+let centerY = canvas.clientHeight / 2                       //centro em y
+let padding = (canvas.clientWidth - maxWH) / 2              //distancia das bordas ao quadrado
+let min = centerX - (maxWH / 2)                             //distancia minima
+let max = centerX + (maxWH / 2)                             //distancia maxima
+let oct = 0                                                 //octante
+let vectors = []                                            //guarda os vetores
 
 canvas.addEventListener('mousemove', drawToMouse)
-ctx.fillStyle = 'black'
+canvas.addEventListener('click', click)
+btnZero.addEventListener('click', zero)
+btnClear.addEventListener('click', clearCanvas)
 
+ctx.fillStyle = 'black'
 drawGrid()
 
+function click(e){
+    if (vectors.length >= maxVec) return
+    else{
+        let n = normalizeXY(e.clientX, e.clientY, padding, maxWH)
+        let r = restoreXY(n.x, n.y, padding, maxWH)
+
+        ctx.beginPath();
+		ctx.arc(r.x, r.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        vectors.push({x: r.x, y: r.y, o: oct})
+    }
+}
+
+function normalizeXY(_x, _y, padding, maxWH){
+    let x = _x
+    let y = _y
+
+    x = (x - padding) / maxWH
+    if (x < 0) x = 0
+    if (x > 1) x = 1
+    
+    y = (y - padding) / maxWH
+    if (y < 0) y = 0
+    if (y > 1) y = 1
+
+    return {x: x, y: y}
+}
+
+function restoreXY(_x, _y, padding, maxWH){
+    let x = _x
+    let y = _y
+
+    x = x * maxWH + padding
+    y = y * maxWH + padding
+
+    return {x: x, y: y}
+}
+
 function clearCanvas(){
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.beginPath();
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+	ctx.beginPath()
 }
 
 function drawToMouse(e){
     redraw()
 
-    let y = e.clientY
-    let x = e.clientX
+    let n = normalizeXY(e.clientX, e.clientY, padding, maxWH)
+    let r = restoreXY(n.x, n.y, padding, maxWH)
+
+    let cx = n.x * 2 - 1  //normaliza no intervalo -1, 1
+    let cy = 1 - n.y * 2  //normaliza no intervalo 1, -1
+
+    if (cx > 0 && cy > 0 && cx > cy)    oct = 1
+    if (cx > 0 && cy > 0 && cx < cy)    oct = 2
+    if (cx < 0 && cy > 0 && -cx < cy)   oct = 3
+    if (cx < 0 && cy > 0 && -cx > cy)   oct = 4
+    if (cx < 0 && cy < 0 && cx < cy)    oct = 5
+    if (cx < 0 && cy < 0 && cx > cy)    oct = 6
+    if (cx > 0 && cy < 0 && cx < -cy)   oct = 7
+    if (cx > 0 && cy < 0 && cx > -cy)   oct = 8
 
     ctx.strokeStyle = 'black'
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
-    ctx.lineTo(x, y)
+    ctx.lineTo(r.x, r.y)
     ctx.stroke()
 
-    let teste = (y - padding) / maxWH
-    if (teste < 0) teste = 0
-    if (teste > 1) teste = 1
-
-    let teste2 = (x - padding) / maxWH
-    if (teste2 < 0) teste2 = 0
-    if (teste2 > 1) teste2 = 1
-
-    let c = teste2 * 2 - 1  //intervalo -1, 1
-    let d = 1 - teste * 2   //intervalo 1, -1
-
-    if (c > 0 && d > 0 && c > d) q = 1
-    if (c > 0 && d > 0 && c < d) q = 2
-    if (c < 0 && d > 0 && -c < d) q = 3
-    if (c < 0 && d > 0 && -c > d) q = 4
-    if (c < 0 && d < 0 && c < d) q = 5
-    if (c < 0 && d < 0 && c > d) q = 6
-    if (c > 0 && d < 0 && c < -d) q = 7
-    if (c > 0 && d < 0 && c > -d) q = 8
-
-    drawAngle(teste2 * maxWH + padding, teste * maxWH + padding, q, (q % 2 === 0))
+    drawAngle(r.x, r.y, oct, (oct % 2 === 0))
 }
 
-function drawAngle(x, y, q, c){
+function zero(){
+    redraw()
+    drawAngle(centerX, centerY, 0, true)
+}
+
+function drawAngle(x, y, oct, comp){
     ctx.strokeStyle = 'red'
 
-    if (q === 1){
-        if (!c){
+    if (oct === 0){
+        ctx.beginPath()
+        ctx.moveTo(centerX, centerY)
+        ctx.lineTo(x, y)
+    }
+    if (oct === 1){
+        if (!comp){
             ctx.beginPath()
-            ctx.moveTo(400, centerY)
-            ctx.lineTo(400, y)
+            ctx.moveTo(max, centerY)
+            ctx.lineTo(max, y)
         }
         else{
             ctx.beginPath()
@@ -70,10 +118,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(max, min)
         }
     }
-    if (q > 1) {
+    if (oct > 1) {
         drawAngle(x, y, 1, true)
 
-        if (c){
+        if (comp){
             ctx.beginPath()
             ctx.moveTo(max, min)
             ctx.lineTo(x, min)
@@ -84,10 +132,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(centerX, min)
         }
     }
-    if (q > 2) {
+    if (oct > 2) {
         drawAngle(x, y, 2, false)
 
-        if (!c){
+        if (!comp){
             ctx.beginPath()
             ctx.moveTo(max, min)
             ctx.lineTo(x, min)
@@ -98,10 +146,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(min, min)
         }
     }
-    if (q > 3) {
+    if (oct > 3) {
         drawAngle(x, y, 3, true)
 
-        if (c) {
+        if (comp) {
             ctx.beginPath()
             ctx.moveTo(min, min)
             ctx.lineTo(min, y)
@@ -112,10 +160,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(min, centerY)
         }
     }
-    if (q > 4) {
+    if (oct > 4) {
         drawAngle(x, y, 4, true)
 
-        if (!c) {
+        if (!comp) {
             ctx.beginPath()
             ctx.moveTo(min, centerY)
             ctx.lineTo(min, y)
@@ -126,10 +174,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(min, max)
         }
     }
-    if (q > 5) {
+    if (oct > 5) {
         drawAngle(x, y, 5, true)
 
-        if (c) {
+        if (comp) {
             ctx.beginPath()
             ctx.moveTo(min, max)
             ctx.lineTo(x, max)
@@ -140,10 +188,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(centerX, max)
         }
     }
-    if (q > 6) {
+    if (oct > 6) {
         drawAngle(x, y, 6, true)
 
-        if (!c) {
+        if (!comp) {
             ctx.beginPath()
             ctx.moveTo(centerX, max)
             ctx.lineTo(x, max)
@@ -154,10 +202,10 @@ function drawAngle(x, y, q, c){
             ctx.lineTo(max, max)
         }
     }
-    if (q > 7) {
+    if (oct > 7) {
         drawAngle(x, y, 7, true)
 
-        if (c) {
+        if (comp) {
             ctx.beginPath()
             ctx.moveTo(max, max)
             ctx.lineTo(max, y)
