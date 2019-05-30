@@ -42,8 +42,18 @@ function drawToMouse(e){
     let ax = (teste2 > 0.5) ? 'positivo' : 'negativo'
     let ay = (teste < 0.5) ? 'positivo' : 'negativo'    
 
-    let c = teste2 * 2 - 1
-    let d = 1 - teste * 2
+    let c = teste2 * 2 - 1  //intervalo -1, 1
+    let d = 1 - teste * 2   //intervalo 1, -1
+
+    if (c > 0 && d > 0 && c > d) console.log('quadrante 1')
+    if (c > 0 && d > 0 && c < d) console.log('quadrante 2')
+    if (c < 0 && d > 0 && -c < d) console.log('quadrante 3')
+    if (c < 0 && d > 0 && -c > d) console.log('quadrante 4')
+    if (c < 0 && d < 0 && c < d) console.log('quadrante 5')
+    if (c < 0 && d < 0 && c > d) console.log('quadrante 6')
+    if (c > 0 && d < 0 && c < -d) console.log('quadrante 7')
+    if (c > 0 && d < 0 && c > -d) console.log('quadrante 8')
+
 
     console.log('x: ', c, 'y: ', d)
 
