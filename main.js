@@ -36,7 +36,22 @@ function click(e){
     }
 }
 
-function normalizeXY(_x, _y, padding, maxWH){
+function drawVectors(){
+    if (!vectors.length) return
+    else{
+        for (let i = 0; i < vectors.length; i++){
+            ctx.beginPath();
+            ctx.arc(vectors[i].x, vectors[i].y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath()
+            ctx.moveTo(centerX, centerY)
+            ctx.lineTo(vectors[i].x, vectors[i].y)
+            ctx.stroke()
+        }
+    }
+}
+
+function normalizeXY(_x, _y){
     let x = _x
     let y = _y
 
@@ -51,7 +66,7 @@ function normalizeXY(_x, _y, padding, maxWH){
     return {x: x, y: y}
 }
 
-function restoreXY(_x, _y, padding, maxWH){
+function restoreXY(_x, _y){
     let x = _x
     let y = _y
 
@@ -94,8 +109,9 @@ function drawToMouse(e){
 }
 
 function zero(){
+    if (vectors.length < maxVec) vectors.push({x: max, y: centerY, oct: 0})
+    drawAngle(max, centerY, 0, true)
     redraw()
-    drawAngle(centerX, centerY, 0, true)
 }
 
 function drawAngle(x, y, oct, comp){
@@ -233,4 +249,5 @@ function drawGrid(){
 function redraw(){
     clearCanvas()
     drawGrid()
+    drawVectors()
 }
