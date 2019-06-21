@@ -132,11 +132,32 @@ function drawToVector(){
     }
     else {
         let equal = vectors[0].o === vectors[1].o
-        let maior = (!equal && (vectors[0].o < vectors[1].o)) ? 0 : 1
-        let menor = (!equal && (vectors[0].o > vectors[1].o)) ? 0 : 1
-        
-        drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'red')
-        drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), '#ccc')
+        let maior
+        let menor
+
+        if (!equal){
+            menor = (vectors[0].o < vectors[1].o) ? 0 : 1
+            maior = (vectors[0].o > vectors[1].o) ? 0 : 1
+        }
+        else{
+            if (vectors[0].x === vectors[1].x){
+                menor = (vectors[0].y < vectors[1].y) ? 0 : 1
+                maior = (vectors[0].y > vectors[1].y) ? 0 : 1
+            }
+            else{
+                menor = (vectors[0].x < vectors[1].x) ? 0 : 1
+                maior = (vectors[0].x > vectors[1].x) ? 0 : 1
+            }
+        }
+
+        if (!equal){
+            drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), 'red')
+            drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'black')
+        }
+        else{
+            drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'red')
+            drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), 'black')
+        }
     }
 
     return 0
@@ -220,7 +241,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 3) {
-        drawAngle(x, y, 3, true, color)
+        drawAngle(x, y, 3, false, color)
 
         if (!comp) {
             ctx.moveTo(min, centerY)
@@ -244,7 +265,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 5) {
-        drawAngle(x, y, 5, true, color)
+        drawAngle(x, y, 5, false, color)
 
         if (!comp) {
             ctx.moveTo(centerX, max)
@@ -256,7 +277,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 6) {
-        drawAngle(x, y, 6, false, color)
+        drawAngle(x, y, 6, true, color)
 
         if (comp) {
             ctx.moveTo(max, max)
