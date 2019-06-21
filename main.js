@@ -102,22 +102,22 @@ function octant(x, y){
 
     if (cx >= 0){
         if (cy >= 0){
-            if (cx > cy) return 1
-            else return 2
+            if (cx > cy) return 0
+            else return 1
         }
         else{
-            if (cx < -cy) return 7
-            else return 8
+            if (cx < -cy) return 6
+            else return 7
         }
     }
     else{
         if (cy >= 0){
-            if (-cx < cy) return 3
-            else return 4
+            if (-cx < cy) return 2
+            else return 3
         }
         else{
-            if (cx < cy) return 5
-            else return 6
+            if (cx < cy) return 4
+            else return 5
         }
     }
 }
@@ -135,8 +135,8 @@ function drawToVector(){
         let maior = (!equal && (vectors[0].o < vectors[1].o)) ? 0 : 1
         let menor = (!equal && (vectors[0].o > vectors[1].o)) ? 0 : 1
         
-        drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 === 0), 'red')
-        drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 === 0), '#ccc')
+        drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'red')
+        drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), '#ccc')
     }
 
     return 0
@@ -159,7 +159,7 @@ function drawToMouse(e){
     ctx.lineTo(r.x, r.y)
     ctx.stroke()
 
-    drawAngle(r.x, r.y, o, (o % 2 === 0), 'red')
+    drawAngle(r.x, r.y, o, (o % 2 !== 0), 'red')
 }
 
 function zero(){
@@ -173,10 +173,6 @@ function drawAngle(x, y, oct, comp, color){
     ctx.beginPath()
 
     if (oct === 0){
-        ctx.moveTo(centerX, centerY)
-        ctx.lineTo(centerX, centerY)
-    }
-    if (oct === 1){
         if (!comp){
             ctx.moveTo(max, centerY)
             ctx.lineTo(max, y)
@@ -186,8 +182,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(max, min)
         }
     }
-    if (oct > 1) {
-        drawAngle(x, y, 1, true, color)
+    if (oct > 0) {
+        drawAngle(x, y, 0, true, color)
 
         if (comp){
             ctx.moveTo(max, min)
@@ -198,8 +194,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(centerX, min)
         }
     }
-    if (oct > 2) {
-        drawAngle(x, y, 2, false, color)
+    if (oct > 1) {
+        drawAngle(x, y, 1, false, color)
 
         if (!comp){
             ctx.moveTo(max, min)
@@ -211,8 +207,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(min, min)
         }
     }
-    if (oct > 3) {
-        drawAngle(x, y, 3, true, color)
+    if (oct > 2) {
+        drawAngle(x, y, 2, true, color)
 
         if (comp) {
             ctx.moveTo(min, min)
@@ -223,8 +219,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(min, centerY)
         }
     }
-    if (oct > 4) {
-        drawAngle(x, y, 4, true, color)
+    if (oct > 3) {
+        drawAngle(x, y, 3, true, color)
 
         if (!comp) {
             ctx.moveTo(min, centerY)
@@ -235,8 +231,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(min, max)
         }
     }
-    if (oct > 5) {
-        drawAngle(x, y, 5, true, color)
+    if (oct > 4) {
+        drawAngle(x, y, 4, true, color)
 
         if (comp) {
             ctx.moveTo(min, max)
@@ -247,8 +243,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(centerX, max)
         }
     }
-    if (oct > 6) {
-        drawAngle(x, y, 6, true, color)
+    if (oct > 5) {
+        drawAngle(x, y, 5, true, color)
 
         if (!comp) {
             ctx.moveTo(centerX, max)
@@ -259,8 +255,8 @@ function drawAngle(x, y, oct, comp, color){
             ctx.lineTo(max, max)
         }
     }
-    if (oct > 7) {
-        drawAngle(x, y, 7, false, color)
+    if (oct > 6) {
+        drawAngle(x, y, 6, false, color)
 
         if (comp) {
             ctx.moveTo(max, max)
