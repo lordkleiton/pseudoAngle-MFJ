@@ -18,7 +18,7 @@ let vectors = []                                            //guarda os vetores
 canvas.addEventListener('mousemove', drawToMouse)
 canvas.addEventListener('click', click)
 btnZero.addEventListener('click', zero)
-btnClear.addEventListener('click', clearCanvas)
+btnClear.addEventListener('click', clear)
 btnVector.addEventListener('click', drawToVector)
 
 ctx.fillStyle = 'black'
@@ -38,6 +38,7 @@ function click(e){
         
         vectors.push({x: r.x, y: r.y, o: o})
     }
+    if (vectors.length >= maxVec) drawToVector()
 }
 
 function drawVectors(){
@@ -85,6 +86,11 @@ function clearCanvas(){
 	ctx.beginPath()
 }
 
+function clear(){
+    vectors = []
+    redraw()
+}
+
 function normalizeInterval(x, y){
     return {x: x * 2 - 1, y: 1 - y * 2}
 }
@@ -94,29 +100,15 @@ function octant(x, y){
     let cx = n.x
     let cy = n.y
 
-    if (cx > 0 && cy > 0 && cx > cy)    return 1
-    if (cx > 0 && cy > 0 && cx < cy)    return 2
-    if (cx < 0 && cy > 0 && -cx < cy)   return 3
-    if (cx < 0 && cy > 0 && -cx > cy)   return 4
-    if (cx < 0 && cy < 0 && cx < cy)    return 5
-    if (cx < 0 && cy < 0 && cx > cy)    return 6
-    if (cx > 0 && cy < 0 && cx < -cy)   return 7
-    if (cx > 0 && cy < 0 && cx > -cy)   return 8
-    return 0
-}
-
-function drawToAngles(v, p){
-    if (v.length < 2 || v.length > 2) return 1
-
-    let equal = v[0].o === v[1].o
-    let from = (!equal && (v[0].o < v[1].o)) ? 0 : 1
-    let to = (!equal && (v[0].o > v[1].o)) ? 0 : 1
-
-    let n1 = normalizeXY(v[0].x, v[0].y)
-    let n2 = normalizeXY(v[1].x, v[1].y)
-
-    n1 = normalizeInterval(n1.x, n1.y)
-    n2 = normalizeInterval(n2.x, n2.y)
+    if (cx > 0 && cy > 0 && cx > cy)        return 1
+    else if (cx > 0 && cy > 0 && cx < cy)   return 2
+    else if (cx < 0 && cy > 0 && -cx < cy)  return 3
+    else if (cx < 0 && cy > 0 && -cx > cy)  return 4
+    else if (cx < 0 && cy < 0 && cx < cy)   return 5
+    else if (cx < 0 && cy < 0 && cx > cy)   return 6
+    else if (cx > 0 && cy < 0 && cx < -cy)  return 7
+    else if (cx > 0 && cy < 0 && cx > -cy)  return 8
+    else return 0
 }
 
 function drawToVector(){
@@ -128,13 +120,22 @@ function drawToVector(){
         drawAngle(vectors[0].x, vectors[0].y, vectors[0].o, (vectors[0].o % 2 === 0), 'red')
     }
     else {
-        drawToAngles(vectors, 20)
+        let equal = vectors[0].o === vectors[1].o
+        let maior = (!equal && (vectors[0].o < vectors[1].o)) ? 0 : 1
+        let menor = (!equal && (vectors[0].o > vectors[1].o)) ? 0 : 1
+        
+        drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 === 0), 'red')
+        drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 === 0), '#ccc')
     }
 
     return 0
 }
 
 function drawToMouse(e){
+    if (vectors.length >= maxVec) {
+        drawToVector()
+        return
+    }
     redraw()
 
     let n = normalizeXY(e.clientX, e.clientY, padding, maxWH)
@@ -162,7 +163,7 @@ function drawAngle(x, y, oct, comp, color){
 
     if (oct === 0){
         ctx.moveTo(centerX, centerY)
-        ctx.lineTo(x, y)
+        ctx.lineTo(centerX, centerY)
     }
     if (oct === 1){
         if (!comp){
@@ -175,7 +176,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 1) {
-        drawAngle(x, y, 1, true, 'color')
+        drawAngle(x, y, 1, true, color)
 
         if (comp){
             ctx.moveTo(max, min)
@@ -187,7 +188,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 2) {
-        drawAngle(x, y, 2, false, 'color')
+        drawAngle(x, y, 2, false, color)
 
         if (!comp){
             ctx.moveTo(max, min)
@@ -200,7 +201,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 3) {
-        drawAngle(x, y, 3, true, 'color')
+        drawAngle(x, y, 3, true, color)
 
         if (comp) {
             ctx.moveTo(min, min)
@@ -212,7 +213,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 4) {
-        drawAngle(x, y, 4, true, 'color')
+        drawAngle(x, y, 4, true, color)
 
         if (!comp) {
             ctx.moveTo(min, centerY)
@@ -224,7 +225,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 5) {
-        drawAngle(x, y, 5, true, 'color')
+        drawAngle(x, y, 5, true, color)
 
         if (comp) {
             ctx.moveTo(min, max)
@@ -236,7 +237,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 6) {
-        drawAngle(x, y, 6, true, 'color')
+        drawAngle(x, y, 6, true, color)
 
         if (!comp) {
             ctx.moveTo(centerX, max)
@@ -248,7 +249,7 @@ function drawAngle(x, y, oct, comp, color){
         }
     }
     if (oct > 7) {
-        drawAngle(x, y, 7, true, 'color')
+        drawAngle(x, y, 7, false, color)
 
         if (comp) {
             ctx.moveTo(max, max)
