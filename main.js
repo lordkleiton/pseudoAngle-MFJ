@@ -5,7 +5,7 @@ let maxVec = 2                                              //maximo de vetores
 let canvas = document.getElementById('cv')                  //canvas
 let btnZero = document.getElementById('zera')               //botão que zera
 let btnClear = document.getElementById('limpa')             //botão que limpa
-let btnVector = document.getElementById('vetor')             //botão que limpa
+let btnVector = document.getElementById('vetor')            //botão que desenha até o vetor
 let ctx = canvas.getContext('2d')                           //contexto
 let centerX = canvas.clientWidth / 2                        //centro em x
 let centerY = canvas.clientHeight / 2                       //centro em y
@@ -100,15 +100,26 @@ function octant(x, y){
     let cx = n.x
     let cy = n.y
 
-    if (cx > 0 && cy > 0 && cx > cy)        return 1
-    else if (cx > 0 && cy > 0 && cx < cy)   return 2
-    else if (cx < 0 && cy > 0 && -cx < cy)  return 3
-    else if (cx < 0 && cy > 0 && -cx > cy)  return 4
-    else if (cx < 0 && cy < 0 && cx < cy)   return 5
-    else if (cx < 0 && cy < 0 && cx > cy)   return 6
-    else if (cx > 0 && cy < 0 && cx < -cy)  return 7
-    else if (cx > 0 && cy < 0 && cx > -cy)  return 8
-    else return 0
+    if (cx >= 0){
+        if (cy >= 0){
+            if (cx > cy) return 1
+            else return 2
+        }
+        else{
+            if (cx < -cy) return 7
+            else return 8
+        }
+    }
+    else{
+        if (cy >= 0){
+            if (-cx < cy) return 3
+            else return 4
+        }
+        else{
+            if (cx < cy) return 5
+            else return 6
+        }
+    }
 }
 
 function drawToVector(){
