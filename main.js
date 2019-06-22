@@ -6,6 +6,9 @@ let canvas = document.getElementById('cv')                  //canvas
 let btnZero = document.getElementById('zera')               //botão que zera
 let btnClear = document.getElementById('limpa')             //botão que limpa
 let btnVector = document.getElementById('vetor')            //botão que desenha até o vetor
+let pri = document.getElementById('p')
+let seg = document.getElementById('s')
+let dif = document.getElementById('d')
 let ctx = canvas.getContext('2d')                           //contexto
 let centerX = canvas.clientWidth / 2                        //centro em x
 let centerY = canvas.clientHeight / 2                       //centro em y
@@ -24,19 +27,39 @@ btnVector.addEventListener('click', drawToVector)
 ctx.fillStyle = 'black'
 drawGrid()
 
+function updateText(){
+    pri.innerText = 'angulo do ponto a: ' + vectors[0].a
+    if (vectors.length > 1){
+        seg.innerText = 'angulo do ponto b: ' + vectors[1].a
+        dif.innerText = 'diferença entre a e b: ' + (vectors[0].a > vectors[1].a) ? vectors[0].a - vectors[1].a : vectors[1].a - vectors[0].a
+    }
+}
+
 function click(e){
     if (vectors.length >= maxVec) return
     else{
         let n = normalizeXY(e.clientX, e.clientY, padding, maxWH)
         let r = restoreXY(n.x, n.y, padding, maxWH)
+        let o = octant(n.x, n.y)
+        let angulo
 
         ctx.beginPath();
 		ctx.arc(r.x, r.y, 5, 0, 2 * Math.PI);
         ctx.fill();
 
-        let o = octant(n.x, n.y)
-        
-        vectors.push({x: r.x, y: r.y, o: o})
+        n = normalizeInterval(n.x, n.y)
+
+        if (o === 0 || o === 3 || o === 4 || o === 7) {
+            if (o === 0)            angulo = n.y
+            if (o === 3 || o == 4)  angulo = 4 - n.y
+            if (o === 7)            angulo = 8 + n.y
+        }
+        else {
+            if (o === 1 || o === 2) angulo = 2 - n.x
+            if (o === 5 || o === 6) angulo = 6 + n.x
+        }
+
+        vectors.push({ x: r.x, y: r.y, o: o, a: angulo})
     }
     if (vectors.length >= maxVec) drawToVector()
 }
@@ -128,7 +151,7 @@ function drawToVector(){
     redraw()
 
     if (vectors.length === 1){
-        drawAngle(vectors[0].x, vectors[0].y, vectors[0].o, (vectors[0].o % 2 === 0), 'red')
+        drawAngle(vectors[0].x, vectors[0].y, vectors[0].o, (vectors[0].o % 2 !== 0), 'red')
     }
     else {
         let equal = vectors[0].o === vectors[1].o
@@ -159,6 +182,8 @@ function drawToVector(){
             drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), 'black')
         }
     }
+
+    updateText()
 
     return 0
 }
