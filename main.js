@@ -6,9 +6,9 @@ let canvas = document.getElementById('cv')                  //canvas
 let btnZero = document.getElementById('zera')               //botão que zera
 let btnClear = document.getElementById('limpa')             //botão que limpa
 let btnVector = document.getElementById('vetor')            //botão que desenha até o vetor
-let pri = document.getElementById('p')
-let seg = document.getElementById('s')
-let dif = document.getElementById('d')
+let pri = document.getElementById('p')                      //texto
+let seg = document.getElementById('s')                      //texto
+let dif = document.getElementById('d')                      //texto
 let ctx = canvas.getContext('2d')                           //contexto
 let centerX = canvas.clientWidth / 2                        //centro em x
 let centerY = canvas.clientHeight / 2                       //centro em y
@@ -27,11 +27,20 @@ btnVector.addEventListener('click', drawToVector)
 ctx.fillStyle = 'black'
 drawGrid()
 
+function clearText(){
+    pri.innerText = ''
+    seg.innerText = ''
+    dif.innerText = ''
+}
+
 function updateText(){
+    clearText()
+
     pri.innerText = 'angulo do ponto a: ' + vectors[0].a
     if (vectors.length > 1){
+        let d = (vectors[0].a > vectors[1].a) ? vectors[0].a - vectors[1].a : vectors[1].a - vectors[0].a
         seg.innerText = 'angulo do ponto b: ' + vectors[1].a
-        dif.innerText = 'diferença entre a e b: ' + (vectors[0].a > vectors[1].a) ? vectors[0].a - vectors[1].a : vectors[1].a - vectors[0].a
+        dif.innerText = 'diferença entre a e b: ' + d
     }
 }
 
@@ -61,7 +70,7 @@ function click(e){
 
         vectors.push({ x: r.x, y: r.y, o: o, a: angulo})
     }
-    if (vectors.length >= maxVec) drawToVector()
+    drawToVector()
 }
 
 function drawVectors(){
@@ -112,6 +121,7 @@ function clearCanvas(){
 function clear(){
     vectors = []
     redraw()
+    clearText()
 }
 
 function normalizeInterval(x, y){
@@ -157,6 +167,7 @@ function drawToVector(){
         let equal = vectors[0].o === vectors[1].o
         let maior
         let menor
+        let o = (equal) ? vectors[0].o : ''
 
         if (!equal){
             menor = (vectors[0].o < vectors[1].o) ? 0 : 1
@@ -169,7 +180,7 @@ function drawToVector(){
             }
             else{
                 menor = (vectors[0].x < vectors[1].x) ? 0 : 1
-                maior = (vectors[0].x > vectors[1].x) ? 0 : 1
+                maior = (vectors[0].x > vectors[1].x) ? 0 : 1           
             }
         }
 
@@ -178,8 +189,14 @@ function drawToVector(){
             drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'black')
         }
         else{
-            drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'red')
-            drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), 'black')
+            if (o === 0 || o === 1 || o === 2 || o == 7){
+                drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'red')
+                drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), 'black')
+            }
+            else{
+                drawAngle(vectors[maior].x, vectors[maior].y, vectors[maior].o, (vectors[maior].o % 2 !== 0), 'red')
+                drawAngle(vectors[menor].x, vectors[menor].y, vectors[menor].o, (vectors[menor].o % 2 !== 0), 'black')
+            }
         }
     }
 
